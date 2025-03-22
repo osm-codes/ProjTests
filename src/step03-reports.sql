@@ -10,13 +10,19 @@
 CREATE VIEW projtest.vw01_SRIDs AS
   SELECT srid, auth_name
   FROM spatial_ref_sys
-  WHERE srid IN (952019,9377,955001,955010,955030,955032)
+  WHERE srid IN (952019,955001,955002,955010,955030,955032)
 ;
 CREATE VIEW projtest.vw03_refPoints AS
   SELECT * FROM ( VALUES
-    (ST_Point(-46.63333,-23.550,4326), 'Sao Paulo', 760 ), 
-    (ST_Point(-68.13333,-16.496,4326), 'La Paz', 3650 ) 
-  ) t1 (pt_geom,city_name,elevation)
+    (ST_Point(-46.633956,-23.550385,4326), 'BR', 'Sao Paulo', 760 ), 
+    (ST_Point(-68.13333,-16.496,4326), 'BO', 'La Paz', 3650 ),
+    (ST_Point(-60.023333,-3.130278,4326), 'BR', 'Manaus', 90 ), 
+    (ST_Point(-38.522481,-3.807267,4326), 'BR', 'Fortaleza', 20 ), 
+    (ST_Point(-57.03694, -29.78333,4326), 'BR', 'Uruguaiana', 70 ), 
+    (ST_Point(-53.807348,-29.685718,4326), 'BR', 'Santa Maria', 110 ),
+    (ST_Point(-47.899213,-15.78340,4326), 'BR', 'Mané Garrincha (estadio)', 1200 ), 
+    (ST_Point(-29.326123,-20.508324,4326), 'BR', 'Trindade (ilha)', 170 )
+  ) t1 (pt_geom,country_code,city_name,elevation)
 ;
        
 CREATE VIEW projtest.vw05_samples AS
@@ -32,7 +38,7 @@ CREATE VIEW projtest.vw05_samples AS
 -- REPORTS:
 
 CREATE VIEW projtest.vw02_proj_cmp_raw AS
- SELECT auth_name as proj_name,
+ SELECT auth_name ||' (srid'||srid||')' as proj_name,
   '`'|| ghs ||'`' AS ghs,
   city_name,
   round( m2/1000.0^2, 5) as km2,
@@ -42,6 +48,7 @@ CREATE VIEW projtest.vw02_proj_cmp_raw AS
          ST_Area(s.geom,true) AS m2, 
          ST_Transform(s.geom, i.srid) as geom
   FROM projtest.vw01_SRIDs i, projtest.vw05_samples s
+  WHERE s.country_code='BR'
  ) t1
  ORDER BY 1,2
 ;
@@ -75,8 +82,8 @@ CREATE VIEW projtest.vw04_area_factors AS
  ) t1 ORDER BY 1,2
 ;
 
------ SHOW report:
-
+/* ----- SHOW report:
 SELECT * FROM projtest.vw04_proj_cmp_full ;
 SELECT * FROM projtest.vw06_proj_cmp_summary;
 SELECT * FROM projtest.vw04_area_factors;
+*/
