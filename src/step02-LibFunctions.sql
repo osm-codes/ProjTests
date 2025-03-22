@@ -1,6 +1,8 @@
--- AREA CORRECTION BY ELEVATION
--- AREA CORRECTION FACTOR
--- See https://gis.stackexchange.com/q/491266/7505
+/**
+ * Install step 2.
+ * Module: library of functions (mainly for area correction).
+ * Ref: https://gis.stackexchange.com/q/491266/7505 and https://www.linkedin.com/in/jason-balkenbush-99452049/
+ */
 
 DROP SCHEMA IF EXISTS projtest CASCADE
 ;
@@ -63,22 +65,3 @@ SELECT ---- the CORRECTION FACTOR: ----
       (SELECT erad FROM earth_rad)
     ) -- same as ST_Distance(p1,p2,true)?
 $f$ language SQL immutable;
-
-CREATE VIEW projtest.vw01_area_factors AS
- SELECT '`'||ghs||'`' as ghs, city_name, elevation,
-  round( sea_m2/1000^2, 5) as sea_km2,
-  round( sea_m2*afat/1000^2, 5) as elev_km2,
-  round(100.0*afat - 100, 4)::text||'%' km2_change
- FROM (
-  SELECT *, ST_Area(geom,true) AS sea_m2, 
-            projtest.area_correction_factor(geom,elevation) as afat
-  FROM (
-   SELECT *, ST_GeomFromGeoHash(ghs) geom
-   FROM generate_series(5,7) t0(ghs_digits), LATERAL ( VALUES
-     (ST_GeoHash( ST_Point(-46.63333,-23.550,4326), ghs_digits ), 'Sao Paulo', 760 ), 
-     (ST_GeoHash( ST_Point(-68.13333,-16.496,4326), ghs_digits ), 'La Paz', 3650 ) 
-   ) t1 (ghs,city_name,elevation)
-  ) t2
- ) t3 ORDER BY 1,2
-;
--- SELECT * FROM projtest.vw01_area_factors;
