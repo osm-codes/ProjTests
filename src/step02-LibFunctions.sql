@@ -3,7 +3,27 @@
  * Module: library of functions (mainly for area correction).
  * Ref: https://gis.stackexchange.com/q/491266/7505 and https://www.linkedin.com/in/jason-balkenbush-99452049/
  */
+------
+-- Public Lib:
+CREATE or replace FUNCTION ROUND(float,int) RETURNS NUMERIC AS $wrap$
+   SELECT ROUND($1::numeric,$2)
+$wrap$ language SQL IMMUTABLE;
+COMMENT ON FUNCTION ROUND(float,int)
+  IS 'Cast for ROUND(float,x). Useful for SUM, AVG, etc. See also https://stackoverflow.com/a/20934099/287948.'
+;
 
+CREATE or replace FUNCTION ROUND(
+  input    float,    -- the input number
+  accuracy float     -- accuracy
+) RETURNS float AS $f$
+  SELECT (ROUND($1/accuracy)*accuracy)::numeric(99,9)::float
+  -- SELECT ROUND($1/accuracy)*accuracy
+$f$ language SQL IMMUTABLE;
+COMMENT ON FUNCTION ROUND(float,float)
+  IS 'ROUND by accuracy. See Round9 at https://stackoverflow.com/a/20933882/287948'
+;
+
+------
 DROP SCHEMA IF EXISTS projtest CASCADE
 ;
 CREATE SCHEMA projtest;
