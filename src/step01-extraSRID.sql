@@ -86,7 +86,7 @@ INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) VALU
   NULL -- no srtext
 ),
 ( -- ISEA variant 2
-  955032,  'DGGS:002:rHEALPix',  32,
+  955032,  'DGGS:032:ISEA',  32,
   '+proj=isea +ellps=WGS84',
   NULL -- no srtext
 )
